@@ -492,11 +492,13 @@ field.setFormatter({
         </div>
 
         <pre class="prettyprint docs-example-code docs-example-code-html"><code>&lt;form id="form-test"&gt;
-  &lt;input type="text" class="form-test" placeholder="first name"&gt;
-  &lt;input type="text" class="form-test" placeholder="last name"&gt;
+  &lt;label for="name"&gt;Name&lt;/label&gt; &lt;input type="text" id="name" name="name" class="form-test" placeholder="name"&gt;
+  &lt;label for="email"&gt;Email&lt;/label&gt; &lt;input type="text" id="email" name="email" class="form-test" placeholder="email"&gt;
+  &lt;label for="phone"&gt;Phone&lt;/label&gt; &lt;input type="text" id="phone" name="phone" class="form-test" placeholder="phone"&gt;
   &lt;input type="submit" class="btn btn-primary"&gt;
 &lt;/form&gt;</code></pre>
         <pre class="prettyprint docs-example-code docs-example-code-js"><code>var fields = Array.prototype.filter.call(document.getElementsByClassName('form-test'), function(el) {
+  if(el.id === 'phone') return new FieldKit.TextField(el, new FieldKit.PhoneFormatter());
   return new FieldKit.TextField(el);
 });
 var form = document.getElementById('form-test'),

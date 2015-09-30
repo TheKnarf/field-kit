@@ -4,6 +4,8 @@ import { bind } from './utils';
 import installCaret from './caret';
 import { replaceStringSelection } from './utils';
 
+require('vanilla-autofill-event');
+
 const { getCaret, setCaret } = installCaret();
 
 /**
@@ -53,6 +55,7 @@ class TextField extends Input {
     // Make sure textDidChange fires while the value is correct
     this._needsKeyUpTextDidChangeTrigger = false;
     this._blur = bind(this._blur, this);
+    this._change = bind(this._change, this);
     this._focus = bind(this._focus, this);
     this._click = bind(this._click, this);
     this._paste = bind(this._paste, this);
@@ -71,6 +74,9 @@ class TextField extends Input {
     element.addEventListener('paste', this._paste);
     element.addEventListener('focus', this._focus);
     element.addEventListener('blur', this._blur);
+
+    // Change event could be fired from vanilla-autofill-event
+    element.addEventListener('change', this._change);
 
     if (!element.getAttribute('autocapitalize')) {
       element.setAttribute('autocapitalize', 'off');
@@ -216,6 +222,7 @@ class TextField extends Input {
     element.removeEventListener('paste', this._paste);
     element.removeEventListener('focus', this._focus);
     element.removeEventListener('blur', this._blur);
+    element.removeEventListener('change', this._change);
     delete element['field-kit-text-field'];
   }
 
@@ -722,6 +729,16 @@ class TextField extends Input {
   _blur() {
     this._textFieldDidEndEditing();
     this._syncPlaceholder();
+  }
+
+  /**
+   * This event could be triggered from vanilla-autofill-event. We should try to parse the
+   * text.
+   *
+   * @private
+   */
+  _change() {
+    if (this._formatter) this.setValue(this._formatter.format(this.value()));
   }
 
   /**
